@@ -321,14 +321,9 @@ void AWeapon::UseAmmo()
 	OnAmmoInClipChanged.Broadcast(CurrentAmmoInClip);
 }
 
-int32 AWeapon::GetCurrentAmmo()
+int32 AWeapon::GetCurrentAmmo() const
 {
 	return CurrentAmmo;
-}
-
-int32 AWeapon::GetCurrentAmmoInClip() const
-{
-	return CurrentAmmoInClip;
 }
 
 void AWeapon::AddAmmoCount(int32 ExtraAmount)
@@ -418,6 +413,6 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	DOREPLIFETIME(AWeapon, HitScanTrace);
 
 	DOREPLIFETIME(AWeapon, MyPawn);
-	DOREPLIFETIME(AWeapon, CurrentAmmo);
+	DOREPLIFETIME_CONDITION(AWeapon, CurrentAmmo, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(AWeapon, bIsReloading, COND_SkipOwner);
 }

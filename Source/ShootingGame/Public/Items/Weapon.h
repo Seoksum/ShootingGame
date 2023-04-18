@@ -141,7 +141,6 @@ public:
 	void StartFire();
 	void StopFire();
 
-
 	bool CanReload();
 
 	void StartReload();
@@ -153,34 +152,19 @@ public:
 
 	void ReloadWeapon();
 
-
 	void SetCurrentAmmoCount(int32 AmmoDelta);
 	UFUNCTION(Server, Reliable)
-		void ServerSetCurrentAmmoCount(int32 AmmoDelta);
+	void ServerSetCurrentAmmoCount(int32 AmmoDelta);
 
 	void UseAmmo();
 
-	int32 GetCurrentAmmo();
-
-	int32 GetCurrentAmmoInClip() const;
+	int32 GetCurrentAmmo() const;
 
 	void AddAmmoCount(int32 ExtraAmount);
 	
 	UFUNCTION()
 	void OnRep_TotalAmmoCount();
 
-	FTimerHandle TimerHandle_StopReload;
-	FTimerHandle TimerHandle_HandleFiring;
-
-
-	UPROPERTY(EditDefaultsOnly, Category = "Animations")
-		UAnimMontage* ReloadAnim;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sounds")
-		USoundBase* FireSound;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sounds")
-		USoundBase* ReloadSound;
 
 public:
 
@@ -192,25 +176,34 @@ public:
 	UFUNCTION()
 	void OnRep_Reload();
 
-	FOnAmmoInClipChanged OnAmmoInClipChanged;
+	UPROPERTY(EditDefaultsOnly, Category = "Animations")
+	UAnimMontage* ReloadAnim;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sounds")
+	USoundBase* FireSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sounds")
+	USoundBase* ReloadSound;
+
+	FOnAmmoInClipChanged OnAmmoInClipChanged;
 	FOnTotalAmmoChanged OnTotalAmmoChanged;
 
 private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_TotalAmmoCount)
-		int32 CurrentAmmo;
+	int32 CurrentAmmo;
 
 	UPROPERTY(EditDefaultsOnly)
-		int32 CurrentAmmoInClip;
+	int32 CurrentAmmoInClip;
 
 	UPROPERTY(EditDefaultsOnly)
-		int32 MaxAmmo;
+	int32 MaxAmmo;
 
 	UPROPERTY(EditDefaultsOnly)
-		int32 MaxAmmoPerClip;
+	int32 MaxAmmoPerClip;
 
 	EWeaponState CurrentState;
 
-
+	FTimerHandle TimerHandle_StopReload;
+	FTimerHandle TimerHandle_HandleFiring;
 };
