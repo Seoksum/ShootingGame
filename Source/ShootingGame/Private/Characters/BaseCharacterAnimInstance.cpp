@@ -25,7 +25,6 @@ void UBaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			IsFalling = PlayerCharacter->GetMovementComponent()->IsFalling();
 			IsCrouched = PlayerCharacter->bIsCrouched;
 			IsDeath = PlayerCharacter->bIsDeath;
-			IsSprinting = PlayerCharacter->bIsSprinting;
 			IsTargeting = PlayerCharacter->bIsTargeting;
 		}
 	}

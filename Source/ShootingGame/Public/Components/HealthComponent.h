@@ -8,7 +8,6 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FOnHealthChanged, float, Health, float, HealthDelta, const class UDamageType*, DamageType, class AController*, InstigatedBy, AActor*, DamageCauser);
 
-
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class SHOOTINGGAME_API UHealthComponent : public UActorComponent
 {
@@ -26,13 +25,13 @@ protected:
 	bool bIsDead;
 
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "HealthComponent")
-		float Health;
+	float Health;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HealthComponent")
-		float DefaultHealth;
+	float DefaultHealth;
 
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "HealthComponent")
-		float HpRatio;
+	float HpRatio;
 
 
 	UFUNCTION()
@@ -46,5 +45,6 @@ public:
 	FOnHealthChanged OnHealthChanged;
 
 	void Heal(float Amount);
+
 
 };

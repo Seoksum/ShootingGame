@@ -33,7 +33,6 @@ AWeapon::AWeapon()
 	TracerTargetName = "Target";
 
 	BaseDamage = 10.0f;
-	BulletSpread = 2.0f;
 	RateOfFire = 420;
 
 	SetReplicates(true);
@@ -41,7 +40,7 @@ AWeapon::AWeapon()
 	NetUpdateFrequency = 66.0f;
 	MinNetUpdateFrequency = 33.0f;
 
-	MaxAmmo = 134;
+	MaxAmmo = 200;
 	MaxAmmoPerClip = 20;
 
 	CurrentState = EWeaponState::Idle;
@@ -87,11 +86,6 @@ void AWeapon::HandleFire()
 	GetWorldTimerManager().SetTimer(TimerHandle_HandleFiring, this, &AWeapon::HandleFire, TimeBetweenShots, false);
 	LastFiredTime = GetWorld()->GetTimeSeconds();
 
-	//bool bRefiring = (CurrentState == EWeaponState::Firing && TimeBetweenShots > 0.0f);
-	//if (bRefiring)
-	//{
-	//	GetWorldTimerManager().SetTimer(TimerHandle_HandleFiring, this, &AWeapon::HandleFire, TimeBetweenShots, false);
-	//}
 }
 
 
@@ -120,7 +114,6 @@ void AWeapon::Fire()
 	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_GameTraceChannel1, QueryParams);
 	FDamageEvent DamageEvent;
 
-	//EPhysicalSurface HitSurfaceType = SurfaceType_Default;
 	bool bPlayerHit = false;
 
 	if (bHit)
@@ -192,49 +185,13 @@ void AWeapon::OnRep_HitScanTrace()
 
 void AWeapon::StartFire()
 {
-	if (!HasAuthority())
-	{
-		ServerStartFire();
-	}
-
-	//if (bIsReloading)
-	//{
-	//	return;
-	//}
-
 	HandleFire();
 
 }
 
-void AWeapon::ServerStartFire_Implementation()
-{
-	StartFire();
-}
-
-bool AWeapon::ServerStartFire_Validate()
-{
-	return true;
-}
-
-
 void AWeapon::StopFire()
 {
-	if (!HasAuthority())
-	{
-		ServerStopFire();
-	}
-
 	GetWorldTimerManager().ClearTimer(TimerHandle_HandleFiring);
-}
-
-void AWeapon::ServerStopFire_Implementation()
-{
-	StopFire();
-}
-
-bool AWeapon::ServerStopFire_Validate()
-{
-	return true;
 }
 
 void AWeapon::PlayFireEffects(FVector TraceEnd)
@@ -415,16 +372,6 @@ void AWeapon::OnRep_MyPawn()
 	{
 		SetOwningPawn(nullptr);
 	}
-}
-
-void AWeapon::ServerStopReload_Implementation()
-{
-	StopSimulateReload();
-}
-
-bool AWeapon::ServerStopReload_Validate()
-{
-	return true;
 }
 
 bool AWeapon::CanFire()

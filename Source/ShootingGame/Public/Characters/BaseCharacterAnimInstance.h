@@ -41,9 +41,6 @@ public:
 	bool IsDeath;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pawn", Meta = (AllowPrivateAccess = true))
-	bool IsSprinting;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pawn", Meta = (AllowPrivateAccess = true))
 	bool IsTargeting;
 
 

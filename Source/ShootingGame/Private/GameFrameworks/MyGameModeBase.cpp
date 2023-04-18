@@ -22,7 +22,7 @@ void AMyGameModeBase::PostLogin(APlayerController* NewPlayer)
 	Super::PostLogin(NewPlayer);
 
 	AShootingGameState* GS = Cast<AShootingGameState>(UGameplayStatics::GetGameState(GetWorld()));
-	UE_LOG(LogTemp, Log, TEXT("MyLogin : %d"), GS->PlayerArray.Num());
+	UE_LOG(LogTemp, Log, TEXT("Login : %d"), GS->PlayerArray.Num());
 
 }
 

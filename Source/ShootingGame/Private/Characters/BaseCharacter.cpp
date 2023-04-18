@@ -79,20 +79,6 @@ void ABaseCharacter::Tick(float DeltaTime)
 
 	CameraComp->SetFieldOfView(NewFOV);
 
-	if (!IsLocallyControlled()) // 자신말고 다른 플레이어의 움직임을 업데이트
-	{
-		//FRotator NewRot = CameraComp->GetRelativeRotation();
-		//NewRot.Roll = RemoteViewPitch * 360.f / 255.f;
-		//CameraComp->SetRelativeRotation(NewRot);
-
-		//const float PawnViewPitch = (RemoteViewPitch / 255.f) * 360.f;
-		//if (PawnViewPitch != SpringArmComp->GetComponentRotation().Pitch)
-		//{
-		//	FRotator NewRotation = SpringArmComp->GetComponentRotation();
-		//	NewRotation.Pitch = PawnViewPitch;
-		//	SpringArmComp->SetWorldRotation(NewRotation);
-		//}
-	}
 }
 
 void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -110,17 +96,11 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("Zoom", IE_Pressed, this, &ABaseCharacter::BeginZoom);
 	PlayerInputComponent->BindAction("Zoom", IE_Released, this, &ABaseCharacter::EndZoom);
 
-	PlayerInputComponent->BindAction("Sprint", EInputEvent::IE_Pressed, this, &ABaseCharacter::BeginSprinting);
-	PlayerInputComponent->BindAction("Sprint", EInputEvent::IE_Released, this, &ABaseCharacter::EndSprinting);
-
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ABaseCharacter::StartFire);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ABaseCharacter::StopFire);
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ABaseCharacter::Reload);
-
-	PlayerInputComponent->BindAction("Out", IE_Pressed, this, &ABaseCharacter::GetOut);
-
 }
 
 void ABaseCharacter::HealPlayerHealth(int32 HealAmount)
@@ -139,17 +119,7 @@ AWeapon* ABaseCharacter::GetCurrentWeapon() const
 
 void ABaseCharacter::UpDown(float Value)
 {
-	if (Controller && Value != 0.f)
-	{
-		// Limit pitch when walking or falling
-		const bool bLimitRotation = (GetCharacterMovement()->IsMovingOnGround() || GetCharacterMovement()->IsFalling());
-		const FRotator Rotation = bLimitRotation ? GetActorRotation() : Controller->GetControlRotation();
-		const FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
-
-		AddMovementInput(Direction, Value);
-	}
-
-	//AddMovementInput(GetActorForwardVector(), Value);
+	AddMovementInput(GetActorForwardVector(), Value);
 }
 
 void ABaseCharacter::LeftRight(float Value)
@@ -207,45 +177,6 @@ bool ABaseCharacter::ServerSetTargeting_Validate(bool IsTargeting)
 	return true;
 }
 
-
-void ABaseCharacter::BeginSprinting()
-{
-	SetSprinting(true);
-}
-
-void ABaseCharacter::EndSprinting()
-{
-	SetSprinting(false);
-}
-
-void ABaseCharacter::SetSprinting(bool IsSprinting)
-{
-	if (!HasAuthority())
-	{
-		ServerSetSprinting(IsSprinting);
-	}
-
-	bIsSprinting = IsSprinting;
-	if (IsSprinting)
-	{
-		GetCharacterMovement()->MaxWalkSpeed = 800.f;
-	}
-	else
-	{
-		GetCharacterMovement()->MaxWalkSpeed = 500.f;
-	}
-}
-
-void ABaseCharacter::ServerSetSprinting_Implementation(bool IsSprinting)
-{
-	SetSprinting(IsSprinting);
-}
-
-bool ABaseCharacter::ServerSetSprinting_Validate(bool IsSprinting)
-{
-	return true;
-}
-
 void ABaseCharacter::StartFire()
 {
 	if (CurrentWeapon)
@@ -262,15 +193,12 @@ void ABaseCharacter::StopFire()
 	}
 }
 
-void ABaseCharacter::OnHealthChanged( float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+void ABaseCharacter::OnHealthChanged(float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
-	if (HasAuthority())
+	if (Health <= 0.0f && !bIsDeath)
 	{
-		if (Health <= 0.0f && !bIsDeath)
-		{
-			bIsDeath = true;
-			OnDeath();
-		}
+		bIsDeath = true;
+		OnDeath();
 	}
 }
 
@@ -284,8 +212,7 @@ void ABaseCharacter::OnDeath()
 
 	DetachFromControllerPendingDestroy();
 
-	//TearOff();
-
+	TearOff(); // 액터를 분리하여 클라이언트로의 복제를 중지한다.
 	SetActorEnableCollision(true);
 }
 
@@ -297,25 +224,13 @@ void ABaseCharacter::Reload()
 	}
 }
 
-void ABaseCharacter::GetOut()
-{
-	auto PC = UGameplayStatics::GetPlayerController(GetWorld(),0);
-	if (PC)
-	{
-		PC->SetInputMode(FInputModeGameAndUI());
-	}
-}
-
 void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ABaseCharacter, CurrentWeapon);
 	DOREPLIFETIME(ABaseCharacter, bIsDeath);
-
-	DOREPLIFETIME_CONDITION(ABaseCharacter, bIsSprinting, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(ABaseCharacter, bIsTargeting, COND_SkipOwner);
-
 }
 
 

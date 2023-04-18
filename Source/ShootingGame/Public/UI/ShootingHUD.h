@@ -42,10 +42,10 @@ private:
 public:
 
 	UPROPERTY()
-	UUserWidget* Layout;
+	UUserWidget* InGame;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HUDWidgets", Meta = (BlueprintProtected = true))
-	TSubclassOf<UUserWidget> LayoutHUDClass;
+	TSubclassOf<UUserWidget> InGameHUDClass;
 
 	UPROPERTY()
 	UUserWidget* Spectating;
@@ -59,16 +59,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HUDWidgets", Meta = (BlueprintProtected = true))
 	TSubclassOf<UUserWidget> MatchEndHUDClass;
 
-	UPROPERTY()
-	UUserWidget* CurrentWidget;
-
 	EHUDState CurrentState;
 
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	EHUDState GetCurrentState() const;
-
-	UFUNCTION(BlueprintNativeEvent, Category = "HUDEvents")
-	void OnStateChanged(EHUDState NewState);
 
 	void HUDStateChanged(EHUDState NewState);
 

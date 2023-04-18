@@ -18,14 +18,14 @@ UHealthComponent::UHealthComponent()
 void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	if (GetOwnerRole() == ROLE_Authority) // ActorComponentÀÇ GetOwner
+	//if (GetOwnerRole() == ROLE_Authority) // ActorComponentÀÇ GetOwner
+
+	AActor* MyOwner = GetOwner();
+	if (MyOwner)
 	{
-		AActor* MyOwner = GetOwner();
-		if (MyOwner)
-		{
-			MyOwner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::TakeDamage);
-		}
+		MyOwner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::TakeDamage);
 	}
+
 	Health = DefaultHealth;
 }
 
@@ -36,9 +36,10 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const clas
 	{
 		return;
 	}
-	bIsDead = Health <= 0.0f;
+
 	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
 	HpRatio = Health / DefaultHealth;
+	bIsDead = Health <= 0.0f;
 	OnHealthChanged.Broadcast(Health, Damage, DamageType, InstigatedBy, DamageCauser);
 }
 
@@ -48,6 +49,7 @@ void UHealthComponent::Heal(float Amount)
 	{
 		return;
 	}
+	//	UE_LOG(LogTemp, Log, TEXT("Health Changed: %s"), *FString::SanitizeFloat(Health));
 	Health = FMath::Clamp(Health + Amount, 0.f, DefaultHealth);
 	HpRatio = Health / DefaultHealth;
 }
@@ -65,5 +67,3 @@ void UHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UHealthComponent, HpRatio);
 
 }
-
-//	UE_LOG(LogTemp, Log, TEXT("Health Changed: %s"), *FString::SanitizeFloat(Health));

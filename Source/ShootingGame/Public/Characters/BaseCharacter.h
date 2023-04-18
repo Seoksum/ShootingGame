@@ -9,6 +9,8 @@
 class UHealthComponent;
 class AWeapon;
 
+
+
 UCLASS()
 class SHOOTINGGAME_API ABaseCharacter : public ACharacter
 {
@@ -27,15 +29,12 @@ protected:
 
 public:	
 
-	//void UpdateHealthComponent();
-
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void HealPlayerHealth(int32 HealAmount);
 
-	//UFUNCTION(BlueprintCallable, Category = "Weapon")
 	AWeapon* GetCurrentWeapon() const;
 
 protected:
@@ -57,17 +56,6 @@ protected:
 	void ServerSetTargeting_Implementation(bool IsTargeting);
 	bool ServerSetTargeting_Validate(bool IsTargeting);
 
-
-	void BeginSprinting();
-	void EndSprinting();
-
-	void SetSprinting(bool IsSprinting);
-	UFUNCTION(Server, Reliable, WithValidation)
-		void ServerSetSprinting(bool IsSprinting);
-	void ServerSetSprinting_Implementation(bool IsSprinting);
-	bool ServerSetSprinting_Validate(bool IsSprinting);
-
-
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	void StartFire();
 
@@ -80,8 +68,6 @@ protected:
 	void OnDeath();
 
 	void Reload();
-
-	void GetOut();
 
 
 protected:
@@ -111,20 +97,16 @@ protected:
 public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-		UHealthComponent* HealthComp;
+		TWeakObjectPtr<class UHealthComponent> HealthComp;
+		//UHealthComponent* HealthComp;
 
 	UPROPERTY(Transient, Replicated)
 	bool bIsTargeting;
 
 	UPROPERTY(Transient, Replicated)
-	bool bIsSprinting;
-
-	//UPROPERTY(Replicated, BlueprintReadOnly)
-	UPROPERTY(Transient, Replicated)
 	bool bIsDeath;
 
 	UPROPERTY(Transient,Replicated)
 	AWeapon* CurrentWeapon;
-
 
 };

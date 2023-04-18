@@ -15,10 +15,10 @@ AShootingHUD::AShootingHUD()
 	static ConstructorHelpers::FObjectFinder<UTexture2D> CrosshairTexObj(TEXT("Texture2D'/Game/Images/FirstPersonCrosshair.FirstPersonCrosshair'"));
 	CrosshairText = CrosshairTexObj.Object;
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> LayoutClass(TEXT("WidgetBlueprint'/Game/UI/InGame/WBP_HUDLayout.WBP_HUDLayout_C'"));
-	if (LayoutClass.Succeeded())
+	static ConstructorHelpers::FClassFinder<UUserWidget> InGameClass(TEXT("WidgetBlueprint'/Game/UI/InGame/WBP_HUDLayout.WBP_HUDLayout_C'"));
+	if (InGameClass.Succeeded())
 	{
-		LayoutHUDClass = LayoutClass.Class;
+		InGameHUDClass = InGameClass.Class;
 	}
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> SpectatingClass(TEXT("WidgetBlueprint'/Game/UI/InGame/WBP_Spectator.WBP_Spectator_C'"));
@@ -38,9 +38,8 @@ void AShootingHUD::BeginPlay()
 {
 	Spectating = CreateWidget(GetWorld(), SpectatingHUDClass);
 	MatchEnd = CreateWidget(GetWorld(), MatchEndHUDClass);
-	Layout = CreateWidget(GetWorld(), LayoutHUDClass);
-	Layout->AddToViewport();
-	CurrentWidget = Layout;
+	InGame = CreateWidget(GetWorld(), InGameHUDClass);
+	InGame->AddToViewport();
 }
 
 void AShootingHUD::DrawHUD()
@@ -74,35 +73,32 @@ EHUDState AShootingHUD::GetCurrentState() const
 void AShootingHUD::HUDStateChanged(EHUDState NewState)
 {
 	RemoveAllWidgets();
-	UUserWidget* TempWidget = nullptr;
+
+	CurrentState = NewState;
+	UUserWidget* NewWidget = nullptr;
 	switch (NewState)
 	{
 	case EHUDState::Playing :
-		TempWidget = Layout;
+		NewWidget = InGame;
 		break;
 	case EHUDState::Spectating:
-		TempWidget = Spectating;
+		NewWidget = Spectating;
 		break;
 	case EHUDState::MatchEnd:
-		TempWidget = MatchEnd;
+		NewWidget = MatchEnd;
 		break;
 	}
-	if (TempWidget)
+	if (NewWidget)
 	{
-		TempWidget->AddToViewport();
+		NewWidget->AddToViewport();
 	}
-}
-
-void AShootingHUD::OnStateChanged_Implementation(EHUDState NewState)
-{
-	CurrentState = NewState;
 }
 
 void AShootingHUD::RemoveAllWidgets()
 {
 	TArray<UUserWidget*> RemoveWidgets;
 	UWidgetBlueprintLibrary::GetAllWidgetsOfClass(GetWorld(), RemoveWidgets,UUserWidget::StaticClass());
-
+	
 	for (UUserWidget* Widget : RemoveWidgets)
 	{
 		Widget->RemoveFromParent();

@@ -18,15 +18,8 @@ public:
 
 	AMyGameModeBase();
 
-	UPROPERTY()
-	TArray<APlayerController*> PlayerControllerList;
-
 	virtual void PostLogin(class APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting);
-
-	void PawnKilled(APawn* PawnKilled);
-	void EndGame(APawn* InstigatorPawn, bool bMissionSuccess);
-
 
 
 };

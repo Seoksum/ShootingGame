@@ -14,8 +14,7 @@ void UMenuWidget::NativeOnInitialized()
 
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
-	FInputModeUIOnly InputModeData;
-	PlayerController->SetInputMode(InputModeData);
+	PlayerController->SetInputMode(FInputModeUIOnly());
 	PlayerController->bShowMouseCursor = true;
 
 	WBP_InputIP = CreateWidget<UInputIPWidget>(GetWorld(), WBP_InputIPClass);
@@ -31,13 +30,11 @@ void UMenuWidget::NativeOnInitialized()
 void UMenuWidget::CreateServer()
 {
 	MyGameInstance->Host();
-	//MyGameInstance->LaunchLobby(3, true);
 }
 
 void UMenuWidget::JoinServer()
 {
 	this->RemoveFromParent();
-	WBP_InputIP = CreateWidget<UInputIPWidget>(GetWorld(), WBP_InputIPClass);
 	WBP_InputIP->AddToViewport();
 
 }

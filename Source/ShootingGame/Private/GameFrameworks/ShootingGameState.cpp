@@ -61,7 +61,7 @@ void AShootingGameState::EndGame()
 	{
 		Controller->ClientHUDStateChanged(EHUDState::MatchEnd);
 		DisableInput(Controller);
-		Controller->SetInputMode(FInputModeUIOnly());
+		
 	}
 }
 

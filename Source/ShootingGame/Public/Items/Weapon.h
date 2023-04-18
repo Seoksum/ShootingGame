@@ -109,15 +109,9 @@ protected:
 
 	float LastFiredTime;
 
-	/* RPM - Bullets per minute fired by weapon */
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-		float RateOfFire;
+	float RateOfFire;
 
-	/* Bullet Spread in Degrees */
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin = 0.0f))
-		float BulletSpread;
-
-	// Derived from RateOfFire
 	float TimeBetweenShots;
 
 	// 이 속성이 Replicate될 때마다 함수를 트리거 
@@ -126,18 +120,6 @@ protected:
 
 	UFUNCTION()
 	void OnRep_HitScanTrace();
-
-	UPROPERTY(ReplicatedUsing = OnRep_TotalAmmoCount)
-	int32 CurrentAmmo;
-
-	UPROPERTY(EditDefaultsOnly)
-	int32 CurrentAmmoInClip;
-
-	UPROPERTY(EditDefaultsOnly)
-	int32 MaxAmmo;
-
-	UPROPERTY(EditDefaultsOnly)
-	int32 MaxAmmoPerClip;
 
 
 	UFUNCTION(NetMulticast, Unreliable)
@@ -154,42 +136,27 @@ protected:
 
 public:
 
+	bool CanFire();
+
 	void StartFire();
-	UFUNCTION(reliable, Server, WithValidation)
-		void ServerStartFire();
-	void ServerStartFire_Implementation();
-	bool ServerStartFire_Validate();
-
 	void StopFire();
-	UFUNCTION(Reliable, Server, WithValidation)
-		void ServerStopFire();
-	void ServerStopFire_Implementation();
-	bool ServerStopFire_Validate();
 
-	void ReloadWeapon();
 
-	void SetCurrentAmmoCount(int32 AmmoDelta);
-
-	UFUNCTION(Server, Reliable)
-	void ServerSetCurrentAmmoCount(int32 AmmoDelta);
-	
-
-	/* Is weapon and character currently capable of starting a reload */
 	bool CanReload();
 
 	void StartReload();
-
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerStartReload();
-	void ServerStartReload_Implementation();
 	bool ServerStartReload_Validate();
 	
 	void StopSimulateReload();
 
-	UFUNCTION(Reliable, server, WithValidation)
-	void ServerStopReload();
-	void ServerStopReload_Implementation();
-	bool ServerStopReload_Validate();
+	void ReloadWeapon();
+
+
+	void SetCurrentAmmoCount(int32 AmmoDelta);
+	UFUNCTION(Server, Reliable)
+		void ServerSetCurrentAmmoCount(int32 AmmoDelta);
 
 	void UseAmmo();
 
@@ -207,9 +174,6 @@ public:
 
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animations")
-		UAnimMontage* FireAnim;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Animations")
 		UAnimMontage* ReloadAnim;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sounds")
@@ -220,11 +184,7 @@ public:
 
 public:
 
-	bool CanFire();
-
 	EWeaponState GetCurrentState() const;
-
-	EWeaponState CurrentState;
 
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_Reload)
 	bool bIsReloading;
@@ -232,7 +192,25 @@ public:
 	UFUNCTION()
 	void OnRep_Reload();
 
-
 	FOnAmmoInClipChanged OnAmmoInClipChanged;
+
 	FOnTotalAmmoChanged OnTotalAmmoChanged;
+
+private:
+
+	UPROPERTY(ReplicatedUsing = OnRep_TotalAmmoCount)
+		int32 CurrentAmmo;
+
+	UPROPERTY(EditDefaultsOnly)
+		int32 CurrentAmmoInClip;
+
+	UPROPERTY(EditDefaultsOnly)
+		int32 MaxAmmo;
+
+	UPROPERTY(EditDefaultsOnly)
+		int32 MaxAmmoPerClip;
+
+	EWeaponState CurrentState;
+
+
 };
