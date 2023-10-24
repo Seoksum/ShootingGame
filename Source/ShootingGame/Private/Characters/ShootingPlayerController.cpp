@@ -21,7 +21,7 @@ void AShootingPlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	SetShowMouseCursor(false);
-	SetInputMode(FInputModeUIOnly());
+	SetInputMode(FInputModeGameOnly());
 	SetPlayerPlay();
 }
 
